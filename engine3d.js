@@ -1,4 +1,4 @@
-/* Turbofan hero scene - Three.js r160, vendored, MIT */
+/* Turbofan hero scene v4 - Three.js r160, vendored, MIT */
 import * as THREE from './three.module.min.js';
 
 (function () {
@@ -23,14 +23,17 @@ import * as THREE from './three.module.min.js';
   camera.position.set(CAM_BASE.x, CAM_BASE.y, CAM_BASE.z);
 
   // ---------- lights ----------
-  scene.add(new THREE.AmbientLight(0x33404d, 1.15));
-  var key = new THREE.PointLight(0x6fd3bc, 60, 24, 2);
+  scene.add(new THREE.AmbientLight(0x3a4856, 1.2));
+  var key = new THREE.PointLight(0x5eead4, 70, 24, 2);
   key.position.set(3.5, 2.2, 4.5);
   scene.add(key);
-  var rim = new THREE.PointLight(0xe8b04b, 42, 22, 2);
+  var rim = new THREE.PointLight(0xfbbf24, 48, 22, 2);
   rim.position.set(-4.2, -1.6, 2.6);
   scene.add(rim);
-  var fill = new THREE.DirectionalLight(0xdfe9f2, 0.75);
+  var cool = new THREE.PointLight(0x38bdf8, 36, 20, 2);
+  cool.position.set(0.5, -3.2, 3.4);
+  scene.add(cool);
+  var fill = new THREE.DirectionalLight(0xdfe9f2, 0.85);
   fill.position.set(0.5, 1, 6);
   scene.add(fill);
 
@@ -38,9 +41,9 @@ import * as THREE from './three.module.min.js';
   var engine = new THREE.Group();
   scene.add(engine);
 
-  var metalDark = new THREE.MeshStandardMaterial({ color: 0x1c242e, metalness: 0.9, roughness: 0.32, side: THREE.DoubleSide });
-  var metalBlade = new THREE.MeshStandardMaterial({ color: 0x33414d, metalness: 0.92, roughness: 0.26 });
-  var metalHub = new THREE.MeshStandardMaterial({ color: 0x44525e, metalness: 0.95, roughness: 0.22 });
+  var metalDark = new THREE.MeshStandardMaterial({ color: 0x202a36, metalness: 0.9, roughness: 0.3, side: THREE.DoubleSide });
+  var metalBlade = new THREE.MeshStandardMaterial({ color: 0x3a4a5a, metalness: 0.92, roughness: 0.24 });
+  var metalHub = new THREE.MeshStandardMaterial({ color: 0x4c5c6a, metalness: 0.95, roughness: 0.2 });
 
   // nacelle lip + cowl
   var lip = new THREE.Mesh(new THREE.TorusGeometry(2.15, 0.3, 32, 96), metalDark);
@@ -50,7 +53,7 @@ import * as THREE from './three.module.min.js';
   cowl.position.z = -0.75;
   engine.add(cowl);
   var barrel = new THREE.Mesh(new THREE.CylinderGeometry(1.85, 1.68, 1.7, 64, 1, true),
-    new THREE.MeshStandardMaterial({ color: 0x141c24, metalness: 0.7, roughness: 0.55, side: THREE.BackSide }));
+    new THREE.MeshStandardMaterial({ color: 0x16202a, metalness: 0.7, roughness: 0.55, side: THREE.BackSide }));
   barrel.rotation.x = Math.PI / 2;
   barrel.position.z = -0.85;
   engine.add(barrel);
@@ -59,9 +62,36 @@ import * as THREE from './three.module.min.js';
   back.position.z = -1.7;
   engine.add(back);
   var glow = new THREE.Mesh(new THREE.RingGeometry(1.86, 2.02, 64),
-    new THREE.MeshBasicMaterial({ color: 0x6fd3bc, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+    new THREE.MeshBasicMaterial({ color: 0x5eead4, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
   glow.position.z = -1.66;
   engine.add(glow);
+
+  // afterburner-style core glow, pulses with the fan
+  var core = new THREE.Mesh(new THREE.CircleGeometry(0.62, 48),
+    new THREE.MeshBasicMaterial({ color: 0xfb923c, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending }));
+  core.position.z = -1.62;
+  engine.add(core);
+  var coreRing = new THREE.Mesh(new THREE.RingGeometry(0.66, 0.86, 48),
+    new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.0, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+  coreRing.position.z = -1.6;
+  engine.add(coreRing);
+
+  // HUD ring rotating around the nacelle
+  var hud = new THREE.Group();
+  var hudRing = new THREE.Mesh(new THREE.RingGeometry(2.62, 2.64, 96),
+    new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.28, side: THREE.DoubleSide }));
+  hud.add(hudRing);
+  for (var m = 0; m < 36; m++) {
+    var long = m % 9 === 0;
+    var tickMark = new THREE.Mesh(new THREE.PlaneGeometry(long ? 0.05 : 0.024, long ? 0.22 : 0.12),
+      new THREE.MeshBasicMaterial({ color: long ? 0x5eead4 : 0x38bdf8, transparent: true, opacity: long ? 0.6 : 0.34, side: THREE.DoubleSide }));
+    var a = (m / 36) * Math.PI * 2;
+    tickMark.position.set(Math.cos(a) * 2.78, Math.sin(a) * 2.78, 0);
+    tickMark.rotation.z = a + Math.PI / 2;
+    hud.add(tickMark);
+  }
+  hud.position.z = 0.32;
+  engine.add(hud);
 
   // fan: hub + twisted blades
   var fan = new THREE.Group();
@@ -99,6 +129,10 @@ import * as THREE from './three.module.min.js';
   spinner.rotation.x = -Math.PI / 2;
   spinner.position.z = 0.28;
   fan.add(spinner);
+  var spinnerTip = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 20),
+    new THREE.MeshBasicMaterial({ color: 0x5eead4 }));
+  spinnerTip.position.z = 0.74;
+  fan.add(spinnerTip);
   var hubDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.3, 48), metalHub);
   hubDisc.rotation.x = Math.PI / 2;
   hubDisc.position.z = -0.05;
@@ -106,18 +140,24 @@ import * as THREE from './three.module.min.js';
 
   engine.rotation.set(0.06, -0.38, 0);
 
-  // ---------- particles ----------
-  var P = 220;
+  // ---------- particles (teal + amber mix) ----------
+  var P = 260;
   var pGeo = new THREE.BufferGeometry();
   var pPos = new Float32Array(P * 3);
+  var pCol = new Float32Array(P * 3);
+  var cA = new THREE.Color(0x5eead4), cB = new THREE.Color(0x38bdf8), cC = new THREE.Color(0xfbbf24);
   for (var j = 0; j < P; j++) {
     pPos[j * 3] = (Math.random() - 0.5) * 13;
     pPos[j * 3 + 1] = (Math.random() - 0.5) * 8;
     pPos[j * 3 + 2] = (Math.random() - 0.5) * 6;
+    var r = Math.random();
+    var c = r < 0.55 ? cA : (r < 0.85 ? cB : cC);
+    pCol[j * 3] = c.r; pCol[j * 3 + 1] = c.g; pCol[j * 3 + 2] = c.b;
   }
   pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
   var points = new THREE.Points(pGeo, new THREE.PointsMaterial({
-    color: 0x8fb6c9, size: 0.028, transparent: true, opacity: 0.5, sizeAttenuation: true
+    vertexColors: true, size: 0.03, transparent: true, opacity: 0.6, sizeAttenuation: true
   }));
   scene.add(points);
 
@@ -159,7 +199,12 @@ import * as THREE from './three.module.min.js';
     if (!running || reduce) return;
     var dt = Math.min(clock.getDelta(), 0.05);
     var t = clock.elapsedTime;
-    fan.rotation.z -= dt * 1.5;
+    fan.rotation.z -= dt * 1.6;
+    hud.rotation.z += dt * 0.12;
+    var pulse = (Math.sin(t * 2.2) + 1) / 2;
+    core.material.opacity = 0.12 + pulse * 0.22;
+    coreRing.material.opacity = 0.1 + pulse * 0.3;
+    glow.material.opacity = 0.3 + pulse * 0.18;
     engine.rotation.y = -0.38 + Math.sin(t * 0.5) * 0.1;
     engine.rotation.x = 0.06 + Math.sin(t * 0.34) * 0.03;
     px += (tx - px) * 0.04;
@@ -181,6 +226,8 @@ import * as THREE from './three.module.min.js';
   hero.classList.add('has-3d');
   if (reduce) {
     fan.rotation.z = 0.6;
+    core.material.opacity = 0.25;
+    coreRing.material.opacity = 0.3;
     camera.lookAt(engine.position.x * 0.55, engine.position.y * 0.55, 0);
     renderer.render(scene, camera);
   } else {

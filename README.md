@@ -4,5 +4,5 @@ Personal portfolio website of Mohammed Zayed Tigadi, Aircraft Maintenance Techni
 
 Static site (HTML, CSS, vanilla JS), no build step. Served with GitHub Pages.
 
-3D hero: Three.js (MIT), vendored locally. Photos: Wikimedia Commons contributors, credited with each image on the page.
-Fonts: Fraunces and Inter via Google Fonts (OFL).
+3D hero: Three.js (MIT), vendored locally. Aircraft photos: Wikimedia Commons contributors, credited with each image on the page. Portrait (portrait.jpg): the owner's own photo, used with his permission.
+Fonts: Space Grotesk, Inter and IBM Plex Mono via Google Fonts (OFL).

@@ -11,6 +11,9 @@
 
   if (reduce) {
     document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      el.firstChild.nodeValue = el.getAttribute('data-count');
+    });
     return;
   }
 
@@ -32,9 +35,34 @@
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
 
+  // Animated stat counters
+  function animateCount(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    if (isNaN(target)) return;
+    var dur = 1400;
+    var t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.firstChild.nodeValue = String(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var cio = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        animateCount(e.target);
+        cio.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('[data-count]').forEach(function (el) { cio.observe(el); });
+
   // 3D tilt on cards (fine pointers only)
   if (window.matchMedia('(pointer:fine)').matches) {
-    document.querySelectorAll('.fleet-card, .card').forEach(function (card) {
+    document.querySelectorAll('.fleet-card, .card, .engine-card, .stat').forEach(function (card) {
       card.addEventListener('pointermove', function (e) {
         var r = card.getBoundingClientRect();
         var rx = ((e.clientY - r.top) / r.height - 0.5) * -5;
